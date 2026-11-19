@@ -19,11 +19,16 @@ public class UserServlet  extends HttpServlet {
 
     @Override
     public  void doPost(HttpServletRequest request , HttpServletResponse response) throws IOException {
-        Integer id = (Integer)request.getSession().getAttribute("id");
-        String username = (String)request.getSession().getAttribute("username");
-        String password = (String)request.getSession().getAttribute("password");
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
-        if(id==null || username==null || password==null){
+
+        String idJson = request.getParameter("id");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+
+        if(idJson==null || username==null || password==null){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json");
             response.getWriter().write(
@@ -31,6 +36,8 @@ public class UserServlet  extends HttpServlet {
             );
             return;
         }
+
+        Integer id = Integer.parseInt(idJson);
 
         User newUser = new User(id , username , password);
         userService.setUser(id , newUser);
@@ -44,23 +51,28 @@ public class UserServlet  extends HttpServlet {
 
     @Override
     public  void doGet(HttpServletRequest request , HttpServletResponse response) throws IOException {
-        Integer id = (Integer)request.getSession().getAttribute("id");
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        String idJson;
+        idJson = request.getParameter("id");
 
 
-        if(id==null){
+        if(idJson == null){
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setContentType("application/json");
-            response.getWriter().write(
-                    "{\"error\": \"Missing required user details\"}"
-            );
+            response.getWriter().write("{\"error\": \"Missing required user id\"}");
             return;
         }
+
+        Integer id = Integer.parseInt(idJson);
 
         if( !userService.findUser(id)){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             response.setContentType("application/json");
             response.getWriter().write(
-                    "{\"error\": \"Missing required user details\"}"
+                    "{\"error\": \"User not found\"}"
             );
             return;
         }
